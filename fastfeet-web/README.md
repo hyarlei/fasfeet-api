@@ -113,6 +113,7 @@ src/
 ### Layout
 
 Componente principal que envolve as páginas com:
+
 - **Sidebar** responsiva com toggle
 - **Menu de navegação** com ícones
 - **Informações do usuário**
@@ -154,6 +155,7 @@ console.log(user.name, user.role);
 ```
 
 **Funcionalidades:**
+
 - Login com CPF e senha
 - Armazenamento de token no localStorage
 - Configuração automática do header Authorization
@@ -207,6 +209,7 @@ className="px-3 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700"
 ## 🔧 Axios Configuration
 
 O Axios está configurado para:
+
 - Base URL da API
 - Interceptor para adicionar token JWT automaticamente
 - Tratamento de erros 401 (logout automático)
@@ -225,11 +228,13 @@ api.interceptors.request.use((config) => {
 ## 📱 Responsividade
 
 O layout é totalmente responsivo:
+
 - **Mobile**: Sidebar colapsável
 - **Tablet**: Grid adaptativo
 - **Desktop**: Layout completo com sidebar fixa
 
 Classes responsivas:
+
 ```tsx
 className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
 ```
@@ -268,6 +273,7 @@ As variáveis de ambiente com prefixo `VITE_` são incluídas no build.
 ## 📝 Como Adicionar uma Nova Página
 
 1. Criar arquivo na pasta `pages/`:
+
 ```tsx
 // src/pages/MinhaPage.tsx
 export function MinhaPage() {
@@ -277,7 +283,8 @@ export function MinhaPage() {
 }
 ```
 
-2. Adicionar rota em `App.tsx`:
+1. Adicionar rota em `App.tsx`:
+
 ```tsx
 import { MinhaPage } from './pages/MinhaPage';
 
@@ -291,7 +298,8 @@ import { MinhaPage } from './pages/MinhaPage';
 />
 ```
 
-3. Adicionar item no menu (opcional) em `Layout.tsx`:
+1. Adicionar item no menu (opcional) em `Layout.tsx`:
+
 ```tsx
 const menuItems = [
   { icon: Icon, label: 'Minha Página', path: '/minha-rota', emoji: '🎯' },
@@ -301,10 +309,12 @@ const menuItems = [
 ## 🎯 Credenciais de Teste
 
 ### Admin
+
 - **CPF**: `00000000000`
 - **Senha**: `admin123`
 
 ### Entregador
+
 - **CPF**: `11111111111`
 - **Senha**: `entregador123`
 
@@ -337,4 +347,5 @@ export default defineConfig([
     },
   },
 ])
+
 ```

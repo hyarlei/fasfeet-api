@@ -45,6 +45,7 @@ npm install
 ### 2. Configure o banco de dados
 
 Com Docker:
+
 ```bash
 docker-compose up -d
 ```
@@ -217,17 +218,20 @@ src/
 ## 🧩 Módulos
 
 ### Auth Module
+
 - **POST /sessions** - Login e geração de token JWT
 - Validação de CPF e senha
 - Geração de tokens com expiração de 7 dias
 
 ### Users Module
+
 - CRUD completo de usuários
 - Criação de admin e entregadores
 - Hash de senhas com bcrypt
 - Listagem específica de entregadores
 
 ### Orders Module
+
 - CRUD completo de encomendas
 - Geração automática de código de rastreamento
 - Upload de foto de entrega
@@ -235,6 +239,7 @@ src/
 - Controle de timestamps por status
 
 ### Recipients Module
+
 - CRUD completo de destinatários
 - Validação de endereço completo
 
@@ -243,6 +248,7 @@ src/
 ### Autenticação
 
 #### Login
+
 ```http
 POST /sessions
 Content-Type: application/json
@@ -267,6 +273,7 @@ Response: 200 OK
 ### Usuários
 
 #### Listar todos os usuários
+
 ```http
 GET /users
 Authorization: Bearer {token}
@@ -283,6 +290,7 @@ Response: 200 OK
 ```
 
 #### Criar usuário
+
 ```http
 POST /users
 Authorization: Bearer {token}
@@ -297,6 +305,7 @@ Content-Type: application/json
 ```
 
 #### Atualizar usuário
+
 ```http
 PUT /users/:id
 Authorization: Bearer {token}
@@ -308,12 +317,14 @@ Content-Type: application/json
 ```
 
 #### Deletar usuário
+
 ```http
 DELETE /users/:id
 Authorization: Bearer {token}
 ```
 
 #### Listar apenas entregadores
+
 ```http
 GET /users/deliverymen
 Authorization: Bearer {token}
@@ -322,18 +333,21 @@ Authorization: Bearer {token}
 ### Encomendas
 
 #### Listar todas as encomendas
+
 ```http
 GET /orders
 Authorization: Bearer {token}
 ```
 
 #### Buscar encomenda por ID
+
 ```http
 GET /orders/:id
 Authorization: Bearer {token}
 ```
 
 #### Criar encomenda
+
 ```http
 POST /orders
 Authorization: Bearer {token}
@@ -346,6 +360,7 @@ Content-Type: application/json
 ```
 
 #### Atualizar encomenda
+
 ```http
 PUT /orders/:id
 Authorization: Bearer {token}
@@ -357,12 +372,14 @@ Content-Type: application/json
 ```
 
 #### Marcar como retirada
+
 ```http
 PATCH /orders/:id/withdrawn
 Authorization: Bearer {token}
 ```
 
 #### Marcar como entregue (com foto)
+
 ```http
 PATCH /orders/:id/delivered
 Authorization: Bearer {token}
@@ -372,6 +389,7 @@ photo: [arquivo]
 ```
 
 #### Deletar encomenda
+
 ```http
 DELETE /orders/:id
 Authorization: Bearer {token}
@@ -380,18 +398,21 @@ Authorization: Bearer {token}
 ### Destinatários
 
 #### Listar todos
+
 ```http
 GET /recipients
 Authorization: Bearer {token}
 ```
 
 #### Buscar por ID
+
 ```http
 GET /recipients/:id
 Authorization: Bearer {token}
 ```
 
 #### Criar destinatário
+
 ```http
 POST /recipients
 Authorization: Bearer {token}
@@ -409,6 +430,7 @@ Content-Type: application/json
 ```
 
 #### Atualizar destinatário
+
 ```http
 PUT /recipients/:id
 Authorization: Bearer {token}
@@ -420,6 +442,7 @@ Content-Type: application/json
 ```
 
 #### Deletar destinatário
+
 ```http
 DELETE /recipients/:id
 Authorization: Bearer {token}
@@ -438,9 +461,11 @@ Authorization: Bearer {token}
 ### Guards
 
 #### JwtAuthGuard
+
 Protege rotas que requerem autenticação.
 
 #### RolesGuard
+
 Protege rotas baseado em roles (ADMIN/DELIVERYMAN).
 
 #### Uso nos Controllers
@@ -489,7 +514,6 @@ Este projeto está sob a licença MIT.
 ## 👨‍💻 Desenvolvido por
 
 **Hyarlei Silva** - [GitHub](https://github.com/hyarlei)
-
 
 ## Stay in touch
 
