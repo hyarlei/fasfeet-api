@@ -1,91 +1,495 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# 🚀 FastFeet API
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+API REST desenvolvida com **NestJS** e **Prisma ORM** para gerenciamento de entregas. Sistema completo com autenticação JWT, controle de acesso baseado em roles e upload de arquivos.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## 📋 Índice
 
-## Description
+- [Tecnologias](#-tecnologias)
+- [Pré-requisitos](#-pré-requisitos)
+- [Instalação](#-instalação)
+- [Variáveis de Ambiente](#-variáveis-de-ambiente)
+- [Database](#-database)
+- [Estrutura do Projeto](#-estrutura-do-projeto)
+- [Módulos](#-módulos)
+- [API Endpoints](#-api-endpoints)
+- [Autenticação](#-autenticação)
+- [Testes](#-testes)
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## 🛠 Tecnologias
 
-## Project setup
+- **NestJS** - Framework Node.js progressivo
+- **TypeScript** - Superset JavaScript com tipagem
+- **Prisma ORM** - ORM para PostgreSQL
+- **PostgreSQL** - Banco de dados relacional
+- **Passport JWT** - Autenticação JWT
+- **bcryptjs** - Hash de senhas
+- **class-validator** - Validação de DTOs
+- **class-transformer** - Transformação de objetos
+- **Multer** - Upload de arquivos
+
+## 📦 Pré-requisitos
+
+- Node.js >= 18
+- npm ou yarn
+- PostgreSQL >= 14
+- Docker (opcional)
+
+## 🚀 Instalação
+
+### 1. Clone e instale as dependências
 
 ```bash
-$ npm install
+npm install
 ```
 
-## Compile and run the project
+### 2. Configure o banco de dados
+
+Com Docker:
+```bash
+docker-compose up -d
+```
+
+Sem Docker, configure o PostgreSQL manualmente e ajuste a `DATABASE_URL` no arquivo `.env`.
+
+### 3. Configure as variáveis de ambiente
 
 ```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+cp .env.example .env
 ```
 
-## Run tests
+Edite o arquivo `.env` com suas credenciais.
+
+### 4. Execute as migrations
+
+```bash
+npx prisma migrate dev
+```
+
+### 5. Gere o Prisma Client
+
+```bash
+npx prisma generate
+```
+
+### 6. (Opcional) Popular o banco com dados de teste
+
+```bash
+npx prisma db seed
+```
+
+## 🔐 Variáveis de Ambiente
+
+```env
+# Database
+DATABASE_URL="postgresql://postgres:postgres@localhost:5432/fastfeet?schema=public"
+
+# JWT
+JWT_SECRET="sua-chave-secreta-super-segura-aqui"
+
+# Server
+PORT=3333
+```
+
+## 💾 Database
+
+### Schema Prisma
+
+O projeto utiliza Prisma 7 com configuração separada. O schema está em `prisma/schema.prisma`:
+
+```prisma
+enum UserRole {
+  ADMIN
+  DELIVERYMAN
+}
+
+model User {
+  id        String   @id @default(uuid())
+  name      String
+  cpf       String   @unique
+  password  String
+  role      UserRole @default(DELIVERYMAN)
+  deliveries Order[]
+}
+
+model Recipient {
+  id         String @id @default(uuid())
+  name       String
+  street     String
+  number     Int
+  complement String?
+  city       String
+  state      String
+  zipcode    String
+  orders Order[]
+}
+
+enum OrderStatus {
+  WAITING
+  WITHDRAWN
+  DELIVERED
+  RETURNED
+}
+
+model Order {
+  id            String      @id @default(uuid())
+  status        OrderStatus @default(WAITING)
+  tracking_code String      @unique
+  photo_url     String?
+  created_at    DateTime    @default(now())
+  updated_at    DateTime?   @updatedAt
+  withdrawn_at  DateTime?
+  delivered_at  DateTime?
+  deliveryman_id String?
+  deliveryman    User?   @relation(fields: [deliveryman_id], references: [id])
+  recipient_id   String
+  recipient      Recipient @relation(fields: [recipient_id], references: [id])
+}
+```
+
+### Comandos Úteis do Prisma
+
+```bash
+# Criar nova migration
+npx prisma migrate dev --name nome_da_migration
+
+# Resetar banco de dados
+npx prisma migrate reset
+
+# Ver status das migrations
+npx prisma migrate status
+
+# Abrir Prisma Studio (GUI do banco)
+npx prisma studio
+
+# Gerar Prisma Client
+npx prisma generate
+```
+
+## 📁 Estrutura do Projeto
+
+```
+src/
+├── auth/                      # Módulo de autenticação
+│   ├── auth.controller.ts     # Endpoint de login
+│   ├── auth.service.ts        # Lógica de autenticação
+│   ├── jwt.strategy.ts        # Estratégia JWT do Passport
+│   ├── roles.decorator.ts     # Decorator para roles
+│   ├── roles.guard.ts         # Guard de autorização
+│   └── dto/
+│       └── login.dto.ts       # DTO de login
+│
+├── users/                     # Módulo de usuários
+│   ├── users.controller.ts    # Endpoints CRUD
+│   ├── users.service.ts       # Lógica de negócio
+│   ├── deliverymen.controller.ts  # Endpoints específicos para entregadores
+│   ├── dto/
+│   │   ├── create-user.dto.ts
+│   │   └── update-user.dto.ts
+│   └── entities/
+│       └── user.entity.ts
+│
+├── orders/                    # Módulo de encomendas
+│   ├── orders.controller.ts   # Endpoints CRUD
+│   ├── orders.service.ts      # Lógica de negócio
+│   ├── dto/
+│   │   ├── create-order.dto.ts
+│   │   └── update-order.dto.ts
+│   └── entities/
+│       └── order.entity.ts
+│
+├── recipients/                # Módulo de destinatários
+│   ├── recipients.controller.ts
+│   ├── recipients.service.ts
+│   ├── dto/
+│   │   ├── create-recipient.dto.ts
+│   │   └── update-recipient.dto.ts
+│   └── entities/
+│       └── recipient.entity.ts
+│
+├── prisma/                    # Módulo Prisma Service
+│   ├── prisma.service.ts      # Serviço global do Prisma
+│   └── prisma.module.ts
+│
+├── app.module.ts              # Módulo raiz
+└── main.ts                    # Bootstrap da aplicação
+```
+
+## 🧩 Módulos
+
+### Auth Module
+- **POST /sessions** - Login e geração de token JWT
+- Validação de CPF e senha
+- Geração de tokens com expiração de 7 dias
+
+### Users Module
+- CRUD completo de usuários
+- Criação de admin e entregadores
+- Hash de senhas com bcrypt
+- Listagem específica de entregadores
+
+### Orders Module
+- CRUD completo de encomendas
+- Geração automática de código de rastreamento
+- Upload de foto de entrega
+- Alteração de status (WAITING → WITHDRAWN → DELIVERED)
+- Controle de timestamps por status
+
+### Recipients Module
+- CRUD completo de destinatários
+- Validação de endereço completo
+
+## 📡 API Endpoints
+
+### Autenticação
+
+#### Login
+```http
+POST /sessions
+Content-Type: application/json
+
+{
+  "cpf": "00000000000",
+  "password": "admin123"
+}
+
+Response: 200 OK
+{
+  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "user": {
+    "id": "uuid",
+    "name": "Admin",
+    "cpf": "00000000000",
+    "role": "ADMIN"
+  }
+}
+```
+
+### Usuários
+
+#### Listar todos os usuários
+```http
+GET /users
+Authorization: Bearer {token}
+
+Response: 200 OK
+[
+  {
+    "id": "uuid",
+    "name": "Admin",
+    "cpf": "00000000000",
+    "role": "ADMIN"
+  }
+]
+```
+
+#### Criar usuário
+```http
+POST /users
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+  "name": "João Silva",
+  "cpf": "12345678900",
+  "password": "senha123",
+  "role": "DELIVERYMAN"
+}
+```
+
+#### Atualizar usuário
+```http
+PUT /users/:id
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+  "name": "João Silva Atualizado"
+}
+```
+
+#### Deletar usuário
+```http
+DELETE /users/:id
+Authorization: Bearer {token}
+```
+
+#### Listar apenas entregadores
+```http
+GET /users/deliverymen
+Authorization: Bearer {token}
+```
+
+### Encomendas
+
+#### Listar todas as encomendas
+```http
+GET /orders
+Authorization: Bearer {token}
+```
+
+#### Buscar encomenda por ID
+```http
+GET /orders/:id
+Authorization: Bearer {token}
+```
+
+#### Criar encomenda
+```http
+POST /orders
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+  "recipient_id": "uuid-do-destinatario",
+  "deliveryman_id": "uuid-do-entregador"
+}
+```
+
+#### Atualizar encomenda
+```http
+PUT /orders/:id
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+  "status": "WITHDRAWN"
+}
+```
+
+#### Marcar como retirada
+```http
+PATCH /orders/:id/withdrawn
+Authorization: Bearer {token}
+```
+
+#### Marcar como entregue (com foto)
+```http
+PATCH /orders/:id/delivered
+Authorization: Bearer {token}
+Content-Type: multipart/form-data
+
+photo: [arquivo]
+```
+
+#### Deletar encomenda
+```http
+DELETE /orders/:id
+Authorization: Bearer {token}
+```
+
+### Destinatários
+
+#### Listar todos
+```http
+GET /recipients
+Authorization: Bearer {token}
+```
+
+#### Buscar por ID
+```http
+GET /recipients/:id
+Authorization: Bearer {token}
+```
+
+#### Criar destinatário
+```http
+POST /recipients
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+  "name": "Maria Santos",
+  "street": "Rua das Flores",
+  "number": 123,
+  "complement": "Apto 45",
+  "city": "São Paulo",
+  "state": "SP",
+  "zipcode": "01234567"
+}
+```
+
+#### Atualizar destinatário
+```http
+PUT /recipients/:id
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+  "name": "Maria Santos Silva"
+}
+```
+
+#### Deletar destinatário
+```http
+DELETE /recipients/:id
+Authorization: Bearer {token}
+```
+
+## 🔒 Autenticação
+
+### JWT Strategy
+
+A API utiliza autenticação JWT com Passport. O token deve ser incluído no header:
+
+```
+Authorization: Bearer {token}
+```
+
+### Guards
+
+#### JwtAuthGuard
+Protege rotas que requerem autenticação.
+
+#### RolesGuard
+Protege rotas baseado em roles (ADMIN/DELIVERYMAN).
+
+#### Uso nos Controllers
+
+```typescript
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles('ADMIN')
+@Get()
+findAll() {
+  // Apenas admins podem acessar
+}
+```
+
+## 🧪 Testes
+
+### Executar testes
 
 ```bash
 # unit tests
-$ npm run test
+npm test
 
 # e2e tests
-$ npm run test:e2e
+npm run test:e2e
 
 # test coverage
-$ npm run test:cov
+npm run test:cov
 ```
 
-## Deployment
-
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+## 🚀 Executando o Projeto
 
 ```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+# Desenvolvimento
+npm run start:dev
+
+# Produção
+npm run build
+npm run start:prod
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+A API estará disponível em `http://localhost:3333`
 
-## Resources
+## 📝 Licença
 
-Check out a few resources that may come in handy when working with NestJS:
+Este projeto está sob a licença MIT.
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+## 👨‍💻 Desenvolvido por
 
-## Support
+**Hyarlei Silva** - [GitHub](https://github.com/hyarlei)
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
 
 ## Stay in touch
 
