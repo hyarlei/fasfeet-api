@@ -1,0 +1,45 @@
+Melhorias Importantes:
+
+5. Máscaras de Input
+CPF formatado (000.000.000-00)
+CEP formatado (00000-000)
+Telefone (se adicionar)
+
+6. Visualização de Foto de Entrega
+Mostrar foto de comprovação no modal de visualização da encomenda
+
+7. Validação de CEP
+Integração com API ViaCEP para autocompletar endereço
+
+8. Filtros Avançados
+Filtrar por status
+Filtrar por entregador
+Filtrar por período
+
+Funcionalidades Extras (Nice to Have):
+9. App do Entregador
+Tela para entregador marcar retirada
+Tela para entregador marcar entrega
+Upload de foto
+
+10. Paginação
+Nas listagens de encomendas, destinatários e entregadores
+
+11. Breadcrumbs
+Para melhor navegação
+
+12. Tratamento de Erros Melhor
+Toast notifications ao invés de alerts
+Mensagens de erro mais amigáveis
+Quer que eu implemente algum desses itens? Sugiro começarmos por:
+Menu de Navegação (essencial para UX)
+Proteção de Rotas (essencial para segurança)
+Gerenciamento de Entregadores (completar o CRUD básico)
+
+Login como Entregador:
+
+CPF: 11111111111
+Senha: entregador123
+
+Login 00000000000
+Senha: admin123
